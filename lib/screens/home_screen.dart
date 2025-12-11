@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'notification_detail_screen.dart';
 import 'map_screen.dart';
-import 'profile_screen.dart';
+
 import 'add_notification_screen.dart';
+import 'admin_screen.dart'; // 1. YENİ: Admin ekranını import ettik
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,8 +15,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
-  // 1. ÖNEMLİ: Veri listesini buraya (State içine) taşıdık.
-  // Böylece üzerine ekleme yapabiliriz.
+  // Veri listesi (Burada duruyor ki hem Ana Sayfa hem Admin erişsin)
   List<Map<String, String>> notifications = [
     {
       "title": "Kütüphane Kliması Arızalı",
@@ -37,16 +37,71 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // 2. ÖNEMLİ: Sayfa içeriğini duruma göre seçen fonksiyon
+  // Sayfa içeriğini seçen fonksiyon
   Widget _buildBody() {
     switch (_selectedIndex) {
       case 0:
-      // Listeyi parametre olarak gönderiyoruz
+      // AKIŞ EKRANI
         return NotificationList(notifications: notifications);
       case 1:
+      // HARİTA EKRANI
         return const MapScreen();
       case 2:
-        return const ProfileScreen();
+      // PROFİL EKRANI (Admin Paneli Butonu İçin Buraya Yazdık)
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircleAvatar(
+                radius: 50,
+                backgroundColor: Color(0xFF0D47A1),
+                child: Icon(Icons.person, size: 50, color: Colors.white),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                  "Emir (Admin)",
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)
+              ),
+              const Text(
+                  "Bilgisayar Mühendisliği",
+                  style: TextStyle(fontSize: 16, color: Colors.grey)
+              ),
+              const SizedBox(height: 30),
+
+              // 2. YENİ: YÖNETİCİ PANELİ BUTONU
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red[800], // Admin rengi
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                ),
+                onPressed: () {
+                  // Admin Paneline git ve listeyi gönder
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AdminScreen(notifications: notifications),
+                    ),
+                  ).then((_) {
+                    // 3. YENİ: Admin panelinden dönünce sayfayı yenile
+                    setState(() {});
+                  });
+                },
+                icon: const Icon(Icons.admin_panel_settings, color: Colors.white),
+                label: const Text("Yönetici Paneli", style: TextStyle(color: Colors.white, fontSize: 16)),
+              ),
+
+              const SizedBox(height: 16),
+              // Çıkış Butonu (Görsel)
+              TextButton.icon(
+                onPressed: () {
+                  // Giriş ekranına döndürebilirsin
+                },
+                icon: const Icon(Icons.logout, color: Colors.grey),
+                label: const Text("Çıkış Yap", style: TextStyle(color: Colors.grey)),
+              )
+            ],
+          ),
+        );
       default:
         return const NotificationList(notifications: []);
     }
@@ -63,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
 
-      body: _buildBody(), // _pages yerine fonksiyonu kullandık
+      body: _buildBody(),
 
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -79,7 +134,6 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: _selectedIndex == 0
           ? FloatingActionButton(
         onPressed: () async {
-          // 3. ÖNEMLİ: Sayfaya git ve sonucunu bekle (await)
           final result = await Navigator.push(
             context,
             MaterialPageRoute(
@@ -87,13 +141,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
 
-          // Eğer geri dönen bir veri varsa listeye ekle
           if (result != null && result is Map<String, String>) {
             setState(() {
-              notifications.insert(0, result); // Listenin en başına ekler
+              notifications.insert(0, result);
             });
-
-            // Kullanıcıya bilgi ver
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text("Bildirim eklendi!"), backgroundColor: Colors.green),
             );
@@ -107,16 +158,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// --- BİLDİRİM LİSTESİ WIDGET'I (Güncellendi) ---
+// --- BİLDİRİM LİSTESİ WIDGET'I ---
 class NotificationList extends StatelessWidget {
-  // Artık listeyi dışarıdan alıyor
   final List<Map<String, String>> notifications;
 
   const NotificationList({super.key, required this.notifications});
 
   @override
   Widget build(BuildContext context) {
-    // Liste boşsa uyarı göster
     if (notifications.isEmpty) {
       return const Center(child: Text("Henüz bildirim yok."));
     }
@@ -162,14 +211,15 @@ class NotificationList extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: notification["status"] == "Açık" ? Colors.red[100] : Colors.green[100],
+                          // Duruma göre renk değişimi (Açık: Kırmızı, İnceleniyor: Turuncu, Çözüldü: Yeşil)
+                          color: _getStatusColor(notification["status"]!),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
                           notification["status"]!,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 11,
-                              color: notification["status"] == "Açık" ? Colors.red : Colors.green,
+                              color: Colors.white,
                               fontWeight: FontWeight.bold
                           ),
                         ),
@@ -195,5 +245,15 @@ class NotificationList extends StatelessWidget {
         );
       },
     );
+  }
+
+  // Renk yardımcı fonksiyonu
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'Açık': return Colors.red;
+      case 'İnceleniyor': return Colors.orange;
+      case 'Çözüldü': return Colors.green;
+      default: return Colors.grey;
+    }
   }
 }
