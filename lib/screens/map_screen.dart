@@ -51,14 +51,14 @@ class _MapScreenState extends State<MapScreen> {
         child: Stack(
           children: [
             // 1. KATMAN: HARİTA GÖRSELİ
-            // Gerçek bir harita hissi vermek için büyük bir görsel kullanıyoruz
+            // Atatürk Üniversitesi Kampüs Haritası
             Container(
               height: 1000,
               width: 1000,
               decoration: const BoxDecoration(
                 image: DecorationImage(
-                  // İnternetten temsili bir kampüs krokisi
-                  image: NetworkImage("https://i.pinimg.com/originals/2d/a9/30/2da930df6141c2c4d60232490b40d656.jpg"),
+                  // İnternetten bulunan Atatürk Üniversitesi kampüs haritası
+                  image: NetworkImage("https://www.atauni.edu.tr/wp-content/uploads/2020/10/kampus_haritasi.jpg"),
                   fit: BoxFit.cover,
                 ),
               ),
