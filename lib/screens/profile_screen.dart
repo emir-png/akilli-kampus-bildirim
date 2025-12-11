@@ -33,7 +33,7 @@ class ProfileScreen extends StatelessWidget {
             // Not: Normalde burası sadece Admin kullanıcıya görünür.
             ListTile(
               leading: const Icon(Icons.admin_panel_settings, color: Colors.red),
-              title: const Text("Yönetici Paneli (Demo)"),
+              title: const Text("Admin Paneli (Demo)"),
               subtitle: const Text("Bildirim durumlarını güncelle"),
               trailing: const Icon(Icons.arrow_forward_ios),
               onTap: () {
