@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'home_screen.dart'; // Ana sayfayı buraya çağırdık
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -24,10 +25,10 @@ class _LoginScreenState extends State<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Logo Alanı
-              Icon(
+              const Icon(
                 Icons.school,
                 size: 80,
-                color: const Color(0xFF0D47A1), // Kampüs mavisi
+                color: Color(0xFF0D47A1), // Kampüs mavisi
               ),
               const SizedBox(height: 20),
               const Text(
@@ -90,8 +91,15 @@ class _LoginScreenState extends State<LoginScreen> {
               // Giriş Butonu
               ElevatedButton(
                 onPressed: () {
-                  // İleride buraya backend kontrolü gelecek
-                  print("Giriş denemesi: ${_studentIdController.text}");
+                  // Konsola bilgi yazdır
+                  print("Giriş yapılıyor: ${_studentIdController.text}");
+
+                  // Ana Sayfaya Yönlendir
+                  // pushReplacement: Geri tuşuna basınca tekrar Login'e dönmemesi için
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF0D47A1),
