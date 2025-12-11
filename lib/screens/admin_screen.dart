@@ -38,7 +38,7 @@ class _AdminScreenState extends State<AdminScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Yönetici Paneli"),
+        title: const Text("Admin Paneli"),
         backgroundColor: Colors.red[800], // Admin olduğu belli olsun diye kırmızı
         foregroundColor: Colors.white,
       ),
